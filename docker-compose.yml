@@ -1,0 +1,67 @@
+version: '3'
+
+volumes:
+  mysql_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+services:
+  api:
+    build: ./arise
+    ports:
+      - 8080:8080
+    environment:
+      - "SPRING_PROFILES_ACTIVE=containerized"
+    healthcheck:
+      test: curl -m 5 --silent --fail --request GET http://localhost:8080/actuator/health | jq --exit-status -n 'inputs | if has("status") then .status=="UP" else false end' > /dev/null || exit 1
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    links:
+      - keycloak
+      - mysql
+  frontend:
+    build: ./arise_ui
+    ports:
+      - 3000:80
+    links:
+      - api
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: arise
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - 3306:3306
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      postgresqlPassword: password
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:14.0.0
+    volumes:
+      - ./arise/setup:/opt/jboss/keycloak/imports
+    environment:
+      KEYCLOAK_IMPORT: ./opt/jboss/keycloak/imports/realm-settings.json -Dkeycloak.profile.feature.upload_scripts=enabled
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+      - 8081:8080
+    depends_on:
+      - postgres

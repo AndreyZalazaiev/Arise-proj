@@ -1,0 +1,66 @@
+{
+  "root": true,
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:jest/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:testing-library/react"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "jest",
+    "react",
+    "jsx-a11y",
+    "react-hooks",
+    "import",
+    "testing-library"
+  ],
+  "rules": {
+    "complexity": ["error", 20],
+    "react-hooks/rules-of-hooks": "error",
+    "react/boolean-prop-naming": 1,
+    "react/prop-types": 1,
+    "react/display-name": 0,
+    "jsx-a11y/heading-has-content": 0,
+    "one-var": ["error", "never"],
+    "import/first": "error",
+    "import/no-amd": "error",
+    "import/no-anonymous-default-export": "warn",
+    "import/no-webpack-loader-syntax": "error",
+    "no-unused-vars": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "modules": true,
+      "spread": true,
+      "restParams": true,
+      "jsx": true
+    }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts?(x)"],
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "rules": {
+        "react/prop-types": 0
+      }
+    }
+  ],
+  "ignorePatterns": ["*.spec.tsx"]
+}
